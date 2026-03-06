@@ -6,7 +6,7 @@ const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_USER = process.env.ADMIN_USER || 'xiaoshu';
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'sunny329';
 
 const DATA_DIR = process.env.DATA_DIR
