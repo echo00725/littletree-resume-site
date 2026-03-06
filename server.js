@@ -2,9 +2,12 @@ const express = require('express');
 const multer = require('multer');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'sunny329';
 
 const DATA_DIR = process.env.DATA_DIR
   ? path.resolve(process.env.DATA_DIR)
@@ -30,6 +33,41 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+function safeEqual(a, b) {
+  const aa = Buffer.from(String(a));
+  const bb = Buffer.from(String(b));
+  if (aa.length !== bb.length) return false;
+  return crypto.timingSafeEqual(aa, bb);
+}
+
+function requireAdmin(req, res, next) {
+  const auth = req.headers.authorization || '';
+  if (!auth.startsWith('Basic ')) {
+    res.set('WWW-Authenticate', 'Basic realm="Admin"');
+    return res.status(401).send('需要后台账号密码');
+  }
+
+  let user = '';
+  let pass = '';
+  try {
+    const decoded = Buffer.from(auth.slice(6), 'base64').toString('utf-8');
+    const idx = decoded.indexOf(':');
+    if (idx >= 0) {
+      user = decoded.slice(0, idx);
+      pass = decoded.slice(idx + 1);
+    }
+  } catch {
+    // ignore
+  }
+
+  if (!safeEqual(user, ADMIN_USER) || !safeEqual(pass, ADMIN_PASSWORD)) {
+    res.set('WWW-Authenticate', 'Basic realm="Admin"');
+    return res.status(401).send('账号或密码错误');
+  }
+
+  return next();
+}
 
 function getDefaultProfile() {
   return {
@@ -100,7 +138,7 @@ app.get('/api/profile', (_req, res) => {
   res.json(loadProfile());
 });
 
-app.post('/api/profile', (req, res) => {
+app.post('/api/profile', requireAdmin, (req, res) => {
   const incoming = req.body;
   if (!incoming || typeof incoming !== 'object') {
     return res.status(400).json({ error: '无效数据' });
@@ -124,7 +162,7 @@ app.post('/api/profile', (req, res) => {
   res.json({ ok: true, profile: merged });
 });
 
-app.post('/api/upload-photo', upload.single('photo'), (req, res) => {
+app.post('/api/upload-photo', requireAdmin, upload.single('photo'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: '未上传图片' });
   const profile = loadProfile();
   profile.photo = `/uploads/${req.file.filename}`;
@@ -132,7 +170,7 @@ app.post('/api/upload-photo', upload.single('photo'), (req, res) => {
   res.json({ ok: true, photo: profile.photo });
 });
 
-app.post('/api/upload-work', upload.single('work'), (req, res) => {
+app.post('/api/upload-work', requireAdmin, upload.single('work'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: '未上传作品图片' });
   const profile = loadProfile();
   profile.portfolio = profile.portfolio || {};
@@ -141,7 +179,7 @@ app.post('/api/upload-work', upload.single('work'), (req, res) => {
   res.json({ ok: true, image: profile.portfolio.image });
 });
 
-app.post('/api/upload-works', upload.array('works', 30), (req, res) => {
+app.post('/api/upload-works', requireAdmin, upload.array('works', 30), (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: '未上传作品图片' });
   }
@@ -158,7 +196,7 @@ app.post('/api/upload-works', upload.array('works', 30), (req, res) => {
   res.json({ ok: true, items: profile.portfolioItems });
 });
 
-app.post('/api/update-work', (req, res) => {
+app.post('/api/update-work', requireAdmin, (req, res) => {
   const { id, title, desc } = req.body || {};
   if (!id) return res.status(400).json({ error: '缺少id' });
 
@@ -170,7 +208,7 @@ app.post('/api/update-work', (req, res) => {
   res.json({ ok: true, items: profile.portfolioItems });
 });
 
-app.post('/api/delete-work', (req, res) => {
+app.post('/api/delete-work', requireAdmin, (req, res) => {
   const { id } = req.body || {};
   if (!id) return res.status(400).json({ error: '缺少id' });
 
@@ -180,7 +218,7 @@ app.post('/api/delete-work', (req, res) => {
   res.json({ ok: true, items: profile.portfolioItems });
 });
 
-app.get('/admin', (_req, res) => {
+app.get('/admin', requireAdmin, (_req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
