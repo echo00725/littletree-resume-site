@@ -2,18 +2,10 @@ services:
   - type: web
     name: littletree-resume-site
     env: docker
-    plan: starter
+    plan: free
     healthCheckPath: /healthz
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
-      - key: DATA_DIR
-        value: /data
-      - key: UPLOAD_DIR
-        value: /data/uploads
-    disk:
-      name: resume-data
-      mountPath: /data
-      sizeGB: 1
