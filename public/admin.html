@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>后台管理 · 简历网站</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <main class="card admin">
+    <h2>后台管理</h2>
+    <p class="tip">你可以在这里修改简历内容，并上传个人照片。</p>
+
+    <div class="grid-2">
+      <div><label>姓名</label><input id="name" /></div>
+      <div><label>头衔</label><input id="title" /></div>
+      <div><label>电话</label><input id="phone" /></div>
+      <div><label>邮箱</label><input id="email" /></div>
+    </div>
+
+    <div style="margin-top: 12px;"><label>城市</label><input id="city" /></div>
+    <div style="margin-top: 12px;"><label>个性标语</label><input id="tagline" /></div>
+    <div style="margin-top: 12px;"><label>个人简介</label><textarea id="about"></textarea></div>
+    <div style="margin-top: 12px;"><label>擅长书法形式（如：行楷创作）</label><input id="specialty" /></div>
+    <div style="margin-top: 12px;"><label>学习轨迹</label><textarea id="trajectory"></textarea></div>
+
+    <div style="margin-top: 12px;"><label>技能（每行一个）</label><textarea id="skills"></textarea></div>
+    <div style="margin-top: 12px;"><label>教育经历（JSON数组）</label><textarea id="education"></textarea></div>
+    <div style="margin-top: 12px;"><label>项目经历（JSON数组）</label><textarea id="projects"></textarea></div>
+    <div style="margin-top: 12px;"><label>获奖（每行一个）</label><textarea id="awards"></textarea></div>
+
+    <div style="margin-top: 12px;"><label>代表作品标题</label><input id="workTitle" /></div>
+    <div style="margin-top: 12px;"><label>代表作品说明</label><textarea id="workDesc"></textarea></div>
+
+    <button class="btn" id="saveBtn">保存简历</button>
+
+    <hr style="border:none; border-top:1px solid rgba(0,0,0,.1); margin:18px 0" />
+    <h3>上传照片</h3>
+    <input type="file" id="photoInput" accept="image/*" />
+    <button class="btn secondary" id="uploadBtn">上传并更新展示图</button>
+
+    <h3>上传代表作品图（单张）</h3>
+    <input type="file" id="workInput" accept="image/*" />
+    <button class="btn secondary" id="uploadWorkBtn">上传作品图</button>
+
+    <h3>上传作品集（多张）</h3>
+    <input type="file" id="worksInput" accept="image/*" multiple />
+    <button class="btn secondary" id="uploadWorksBtn">批量上传作品</button>
+
+    <h3>当前作品集</h3>
+    <div id="worksList" class="works-list"></div>
+
+    <p id="msg" class="tip"></p>
+    <p class="tip">前台展示页：<a href="/" target="_blank">打开主页</a></p>
+  </main>
+
+  <script src="/admin.js"></script>
+</body>
+</html>

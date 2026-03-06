@@ -1,0 +1,7 @@
+<svg width="800" height="1000" viewBox="0 0 800 1000" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="1000" fill="#f7f3ea"/>
+  <circle cx="400" cy="320" r="150" fill="#e5dccb"/>
+  <rect x="180" y="520" width="440" height="300" rx="140" fill="#e5dccb"/>
+  <path d="M120 870C260 810 540 810 680 870" stroke="#2d2a26" stroke-width="8" stroke-linecap="round"/>
+  <text x="400" y="925" text-anchor="middle" font-size="44" fill="#2d2a26" font-family="serif">上传你的写真</text>
+</svg>
