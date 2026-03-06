@@ -34,6 +34,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+const adminSessions = new Map();
+
 function safeEqual(a, b) {
   const aa = Buffer.from(String(a));
   const bb = Buffer.from(String(b));
@@ -41,31 +43,36 @@ function safeEqual(a, b) {
   return crypto.timingSafeEqual(aa, bb);
 }
 
+function parseCookies(req) {
+  const header = req.headers.cookie || '';
+  const out = {};
+  header.split(';').forEach((pair) => {
+    const idx = pair.indexOf('=');
+    if (idx <= 0) return;
+    const k = pair.slice(0, idx).trim();
+    const v = decodeURIComponent(pair.slice(idx + 1).trim());
+    out[k] = v;
+  });
+  return out;
+}
+
+function isAdmin(req) {
+  const cookies = parseCookies(req);
+  const token = cookies.admin_token;
+  if (!token) return false;
+  const exp = adminSessions.get(token);
+  if (!exp) return false;
+  if (Date.now() > exp) {
+    adminSessions.delete(token);
+    return false;
+  }
+  return true;
+}
+
 function requireAdmin(req, res, next) {
-  const auth = req.headers.authorization || '';
-  if (!auth.startsWith('Basic ')) {
-    res.set('WWW-Authenticate', 'Basic realm="Admin"');
-    return res.status(401).send('需要后台账号密码');
+  if (!isAdmin(req)) {
+    return res.status(401).json({ error: '未登录或登录已过期' });
   }
-
-  let user = '';
-  let pass = '';
-  try {
-    const decoded = Buffer.from(auth.slice(6), 'base64').toString('utf-8');
-    const idx = decoded.indexOf(':');
-    if (idx >= 0) {
-      user = decoded.slice(0, idx);
-      pass = decoded.slice(idx + 1);
-    }
-  } catch {
-    // ignore
-  }
-
-  if (!safeEqual(user, ADMIN_USER) || !safeEqual(pass, ADMIN_PASSWORD)) {
-    res.set('WWW-Authenticate', 'Basic realm="Admin"');
-    return res.status(401).send('账号或密码错误');
-  }
-
   return next();
 }
 
@@ -132,6 +139,36 @@ function saveProfile(profile) {
 
 app.get('/healthz', (_req, res) => {
   res.status(200).json({ ok: true });
+});
+
+app.post('/admin/login', (req, res) => {
+  const { username, password } = req.body || {};
+  if (!safeEqual(username, ADMIN_USER) || !safeEqual(password, ADMIN_PASSWORD)) {
+    return res.status(401).json({ ok: false, error: '账号或密码错误' });
+  }
+
+  const token = crypto.randomBytes(24).toString('hex');
+  const expiresAt = Date.now() + 1000 * 60 * 60 * 24 * 7; // 7 days
+  adminSessions.set(token, expiresAt);
+
+  const secure = (req.headers['x-forwarded-proto'] || req.protocol) === 'https';
+  res.setHeader(
+    'Set-Cookie',
+    `admin_token=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${60 * 60 * 24 * 7}${secure ? '; Secure' : ''}`
+  );
+  return res.json({ ok: true });
+});
+
+app.post('/admin/logout', (_req, res) => {
+  res.setHeader('Set-Cookie', 'admin_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0');
+  return res.json({ ok: true });
+});
+
+app.get('/admin', (req, res) => {
+  if (isAdmin(req)) {
+    return res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+  }
+  return res.sendFile(path.join(__dirname, 'public', 'admin-login.html'));
 });
 
 app.get('/api/profile', (_req, res) => {
@@ -216,10 +253,6 @@ app.post('/api/delete-work', requireAdmin, (req, res) => {
   profile.portfolioItems = (profile.portfolioItems || []).filter((x) => x.id !== id);
   saveProfile(profile);
   res.json({ ok: true, items: profile.portfolioItems });
-});
-
-app.get('/admin', requireAdmin, (_req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
 app.listen(PORT, () => {

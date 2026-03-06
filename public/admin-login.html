@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>后台登录</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .login-wrap { max-width: 420px; margin: 8vh auto; }
+    .login-wrap .tip { margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <main class="card login-wrap">
+    <h2>后台登录</h2>
+    <p class="tip">请输入账号和密码后进入管理后台。</p>
+    <div style="margin-top: 12px;"><label>账号</label><input id="username" autocomplete="username" /></div>
+    <div style="margin-top: 12px;"><label>密码</label><input id="password" type="password" autocomplete="current-password" /></div>
+    <button class="btn" id="loginBtn" style="margin-top: 14px;">登录</button>
+    <p id="msg" class="tip"></p>
+  </main>
+
+  <script>
+    const usernameEl = document.getElementById('username');
+    const passwordEl = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const msg = document.getElementById('msg');
+
+    async function login() {
+      msg.textContent = '登录中...';
+      const username = usernameEl.value.trim();
+      const password = passwordEl.value;
+      try {
+        const res = await fetch('/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.ok) {
+          msg.textContent = data.error || '登录失败';
+          return;
+        }
+        location.href = '/admin';
+      } catch (e) {
+        msg.textContent = '网络错误，请稍后重试';
+      }
+    }
+
+    loginBtn.addEventListener('click', login);
+    passwordEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') login();
+    });
+  </script>
+</body>
+</html>
