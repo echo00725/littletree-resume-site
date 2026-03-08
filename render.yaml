@@ -4,8 +4,16 @@ services:
     env: docker
     plan: free
     healthCheckPath: /healthz
+    disk:
+      name: resume-site-data
+      mountPath: /var/data
+      sizeGB: 1
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 3000
+      - key: DATA_DIR
+        value: /var/data
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
