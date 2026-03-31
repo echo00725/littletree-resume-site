@@ -52,6 +52,8 @@ async function init() {
       const wrapper = document.createElement('article');
       wrapper.className = 'page';
       if (i === 1) wrapper.classList.add('first-pdf-cover');
+      // 主公指定：这两页等比例放大，减少留白（仅影响这两页）
+      if (i === 2 || i === 3) wrapper.classList.add('zoom-page');
       wrapper.appendChild(canvas);
 
       book.appendChild(wrapper);
