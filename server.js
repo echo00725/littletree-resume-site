@@ -164,6 +164,14 @@ app.post('/admin/logout', (_req, res) => {
   return res.json({ ok: true });
 });
 
+app.get('/resume', (_req, res) => {
+  return res.sendFile(path.join(__dirname, 'public', 'resume.html'));
+});
+
+app.get('/portfolio', (_req, res) => {
+  return res.sendFile(path.join(__dirname, 'public', 'portfolio.html'));
+});
+
 app.get('/admin', (req, res) => {
   if (isAdmin(req)) {
     return res.sendFile(path.join(__dirname, 'public', 'admin.html'));

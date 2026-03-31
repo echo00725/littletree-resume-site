@@ -1,0 +1,13 @@
+:root{--bg1:#fff8de;--bg2:#ffd86a;--ink:#4b3600}
+*{box-sizing:border-box}
+body{margin:0;font-family:"PingFang SC","Noto Sans SC",system-ui,sans-serif;background:linear-gradient(150deg,var(--bg1),var(--bg2));min-height:100vh;color:var(--ink)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#fff3c7;border-bottom:1px solid #e8c86a;position:sticky;top:0;z-index:5}
+.topbar h1{margin:0;font-size:18px}.back{text-decoration:none;color:#7d5500;font-weight:700}
+.book-wrap{display:grid;grid-template-columns:100px minmax(280px,900px) 100px;gap:8px;align-items:center;justify-content:center;padding:24px 10px}
+.nav{height:44px;border:none;border-radius:12px;background:#ffcb3d;color:#4a3300;font-weight:700;cursor:pointer}
+.book{height:78vh;max-height:920px;min-height:420px;position:relative;perspective:2200px}
+.page{position:absolute;inset:0;transform-origin:left center;transition:transform .8s ease, box-shadow .6s ease;border-radius:6px;overflow:hidden;background:#fff;box-shadow:0 14px 30px rgba(0,0,0,.2);border:1px solid #f0e2b8;display:flex;align-items:center;justify-content:center}
+.page canvas{width:100%;height:100%;object-fit:contain;background:#fff}
+.page.flipped{transform:rotateY(-180deg);box-shadow:0 8px 14px rgba(0,0,0,.15)}
+.footer{text-align:center;padding:6px 10px 18px;color:#6d5000;font-size:13px}
+@media (max-width:900px){.book-wrap{grid-template-columns:70px minmax(240px,1fr) 70px}.topbar h1{font-size:14px}}
