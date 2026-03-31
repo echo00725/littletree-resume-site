@@ -15,5 +15,35 @@ body{margin:0;font-family:"PingFang SC","Noto Sans SC",system-ui,sans-serif;back
 .page canvas{max-width:100%;max-height:100%;width:auto;height:auto;display:block;border-radius:4px;background:transparent}
 .page.flipped{transform:rotateY(-180deg);box-shadow:0 8px 14px rgba(0,0,0,.15)}
 .page.cover canvas{max-width:none;max-height:none}
+
+.custom-cover{padding:0;background:transparent;display:block}
+.custom-cover-inner{
+  position:relative;width:100%;height:100%;border-radius:8px;overflow:hidden;
+  background:
+    radial-gradient(circle at 20% 88%, rgba(255,255,255,.09), transparent 36%),
+    radial-gradient(circle at 10% 92%, rgba(209,246,232,.12), transparent 28%),
+    linear-gradient(180deg,#2f8f86 0%,#2a8a83 45%,#2c8d84 100%);
+}
+.custom-cover-inner::after{
+  content:"";position:absolute;left:0;bottom:0;width:55%;height:35%;opacity:.2;
+  background:radial-gradient(circle at 30% 70%, #b7e6d7 0, transparent 55%);
+}
+.cover-main{
+  position:absolute;right:9%;top:6%;writing-mode:vertical-rl;text-orientation:mixed;
+  font-size:92px;line-height:1;color:#f5fffb;font-weight:800;letter-spacing:6px;
+  text-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+.cover-side-title{
+  position:absolute;right:22%;top:10%;writing-mode:vertical-rl;
+  font-size:44px;color:#effff9;font-weight:700;letter-spacing:2px;
+}
+.cover-en{
+  position:absolute;right:34%;top:10%;writing-mode:vertical-rl;
+  font-size:20px;color:rgba(240,255,250,.8);letter-spacing:1px;
+}
+.cover-year{
+  position:absolute;right:12%;bottom:7%;font-size:28px;color:#effff8;
+  border:1px solid rgba(240,255,250,.55);padding:2px 10px;background:rgba(255,255,255,.08)
+}
 .footer{text-align:center;padding:6px 10px 18px;color:#104131;font-size:13px}
 @media (max-width:900px){.book-wrap{grid-template-columns:70px minmax(240px,1fr) 70px}.topbar h1{font-size:14px}}
