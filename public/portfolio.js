@@ -44,6 +44,7 @@ async function init() {
 
       const wrapper = document.createElement('article');
       wrapper.className = 'page';
+      if (i === 1 || i === doc.numPages) wrapper.classList.add('cover');
       wrapper.appendChild(canvas);
       book.appendChild(wrapper);
       pages.push({ el: wrapper });
