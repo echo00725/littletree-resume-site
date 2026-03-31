@@ -21,11 +21,17 @@ function renderState() {
 }
 
 function nextPage() {
-  if (currentIndex < pages.length) { currentIndex += 1; renderState(); }
+  if (currentIndex < pages.length) {
+    currentIndex += 1;
+    renderState();
+  }
 }
 
 function prevPage() {
-  if (currentIndex > 0) { currentIndex -= 1; renderState(); }
+  if (currentIndex > 0) {
+    currentIndex -= 1;
+    renderState();
+  }
 }
 
 async function init() {
@@ -35,29 +41,18 @@ async function init() {
     statusEl.textContent = `共 ${doc.numPages} 页，渲染中...`;
 
     for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const viewport = page.getViewport({ scale: 1.5 });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
       const wrapper = document.createElement('article');
       wrapper.className = 'page';
-
-      if (i === 1) {
-        wrapper.classList.add('cover', 'custom-cover');
-        wrapper.innerHTML = `
-          <div class="custom-cover-inner">
-            <div class="cover-side-title">郭子姝书法作品集</div>
-            <div class="cover-main">书痕</div>
-            <div class="cover-en">Guo Zishu · Calligraphy & Seal Engraving</div>
-            <div class="cover-year">丙 午</div>
-          </div>
-        `;
-      } else {
-        const page = await doc.getPage(i);
-        const viewport = page.getViewport({ scale: 1.4 });
-        const canvas = document.createElement('canvas');
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-        if (i === doc.numPages) wrapper.classList.add('cover');
-        wrapper.appendChild(canvas);
-      }
+      if (i === 1) wrapper.classList.add('first-pdf-cover');
+      wrapper.appendChild(canvas);
 
       book.appendChild(wrapper);
       pages.push({ el: wrapper });
